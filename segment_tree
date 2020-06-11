@@ -1,0 +1,63 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <unordered_map>
+
+using namespace std;
+
+//segment tree
+vector<int> arr = { 1,9,3,8,4,5,5,9,10,3,4,5 };
+
+vector<int> tree;
+
+int init(int start, int end, int idx) {
+	if (start == end)
+		return tree[idx] = arr[start];
+	int mid = (start + end) / 2;
+	tree[idx] = init(start, mid, idx*2) + init(mid+1, end, idx*2+1);
+	return tree[idx];
+}
+
+int sum(int start, int end, int idx, int left, int right) {
+	// 범위 밖
+	if (right < start || left > end) {
+		return 0;
+	}
+	if (start >= left && end <= right) {
+		return tree[idx];
+	}
+	else {
+		int mid = (start + end) / 2;
+		return sum(start, mid, idx * 2, left, right) + sum(mid + 1, end, idx * 2 + 1, left, right);
+	}
+}
+
+void update(int start, int end, int idx, int diff, int change_idx) {
+	if (change_idx > end || change_idx < start)
+		return;
+	tree[idx] += diff;
+	if (start == end) {
+		return;
+	}
+	int mid = (start + end) / 2;
+	update(start, mid, idx * 2, diff, change_idx);
+	update(mid+1, end, idx * 2+1, diff, change_idx);
+
+
+}
+
+
+void seg() {
+	// memory size 미리 확보
+	for (int i = 0; i < arr.size()*4 ; i++) {
+		tree.push_back(0);
+	}
+	init(0, arr.size() - 1, 1);
+	cout << sum(0, arr.size() - 1, 1, 9, 11) << endl;
+	update(0, arr.size() - 1, 1, -5, 9);
+	cout << sum(0, arr.size() - 1, 1, 9, 11) << endl;
+
+
+	return ;
+}
